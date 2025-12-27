@@ -28,14 +28,10 @@ function useScrollSpy(sectionIds) {
       (entries) => {
         const visible = entries
           .filter((e) => e.isIntersecting)
-          .sort(
-            (a, b) =>
-              (b.intersectionRatio || 0) - (a.intersectionRatio || 0)
-          )[0];
-
+          .sort((a, b) => (b.intersectionRatio || 0) - (a.intersectionRatio || 0))[0];
         if (visible?.target?.id) setActive(visible.target.id);
       },
-      { root: null, threshold: [0.25, 0.4, 0.55] }
+      { threshold: [0.25, 0.4, 0.55] }
     );
 
     els.forEach((el) => obs.observe(el));
@@ -101,18 +97,32 @@ export default function App() {
   const sectionIds = useMemo(() => SECTIONS.map((s) => s.id), []);
   const active = useScrollSpy(sectionIds);
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // set accent
   useEffect(() => {
-    document.documentElement.style.setProperty("--accent", p.accent || "#2f6df6");
+    document.documentElement.style.setProperty("--accent", p.accent);
+  }, []);
+
+  // close drawer on resize to desktop
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth > 900) setDrawerOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   const aboutParagraphs = (p.about || "").split("\n\n").filter(Boolean);
 
-  // show only 4 projects on page
-  const featuredProjects = (p.projects || []).slice(0, 4);
+  const go = (id) => {
+    setDrawerOpen(false);
+    scrollToId(id);
+  };
 
   return (
     <div className="app">
-      {/* background gradient */}
+      {/* background */}
       <div className="bg">
         <div className="bgGlow" />
       </div>
@@ -120,15 +130,39 @@ export default function App() {
       {/* animated network */}
       <Particles accent={p.accent} />
 
-      {/* Sidebar */}
-      <aside className="sidebar">
+      {/* MOBILE TOP BAR */}
+      <header className="mobileTopbar">
+        <div className="mobileLeft">
+          <img className="mobileAvatar" src={p.photoPath} alt={p.name} />
+          <div className="mobileNameWrap">
+            <div className="mobileName">{p.shortSidebarName}</div>
+            <div className="mobileBadge">{p.roleBadge}</div>
+          </div>
+        </div>
+
+        <button
+          className="hamburger"
+          onClick={() => setDrawerOpen((v) => !v)}
+          aria-label="Open menu"
+        >
+          ☰
+        </button>
+      </header>
+
+      {/* MOBILE DRAWER OVERLAY */}
+      <div
+        className={`drawerOverlay ${drawerOpen ? "open" : ""}`}
+        onClick={() => setDrawerOpen(false)}
+      />
+
+      {/* SIDEBAR (desktop + mobile drawer) */}
+      <aside className={`sidebar ${drawerOpen ? "open" : ""}`}>
         <div className="profile">
           <div className="avatarWrap">
             <img className="avatar" src={p.photoPath} alt={p.name} />
           </div>
 
-          {/* FIX: you used p.shortSidebarName but it may not exist in data.js */}
-          <div className="profileName">{p.shortSidebarName || p.hero?.shortName || "Sindhu"}</div>
+          <div className="profileName">{p.shortSidebarName}</div>
           <div className="badge">{p.roleBadge}</div>
 
           <nav className="nav">
@@ -136,7 +170,7 @@ export default function App() {
               <button
                 key={s.id}
                 className={`navItem ${active === s.id ? "active" : ""}`}
-                onClick={() => scrollToId(s.id)}
+                onClick={() => go(s.id)}
               >
                 {s.label}
               </button>
@@ -144,24 +178,11 @@ export default function App() {
           </nav>
         </div>
 
-        {/* bottom icons */}
         <div className="sideIcons">
-          <a
-            className="iconBtn"
-            href={p.github}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="GitHub"
-          >
+          <a className="iconBtn" href={p.github} target="_blank" rel="noreferrer" aria-label="GitHub">
             GH
           </a>
-          <a
-            className="iconBtn"
-            href={p.linkedin}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="LinkedIn"
-          >
+          <a className="iconBtn" href={p.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn">
             in
           </a>
           <a className="iconBtn" href={`mailto:${p.email}`} aria-label="Email">
@@ -170,18 +191,18 @@ export default function App() {
         </div>
       </aside>
 
-      {/* Main */}
+      {/* MAIN */}
       <main className="main">
         {/* HOME */}
         <section id="home" className="section hero">
           <div className="heroInner">
             <h1 className="h1">
-              {p.hero?.hello || "Hi!"}
+              {p.hero.hello}
               <br />
-              I’m {p.hero?.shortName || "Sindhu"}
+              I’m {p.hero.shortName}
             </h1>
 
-            <Typed prefix={p.hero?.typedPrefix || "I’m a"} words={p.taglineTyped || []} />
+            <Typed prefix={p.hero.typedPrefix} words={p.taglineTyped} />
           </div>
         </section>
 
@@ -201,7 +222,7 @@ export default function App() {
         <section id="interests" className="section">
           <SectionTitle kicker="INTERESTS" title="INTERESTS" />
           <div className="grid cards">
-            {(p.interestsCards || []).map((c) => (
+            {p.interestsCards.map((c) => (
               <div className="miniCard" key={c.title}>
                 <div className="emoji" style={{ color: c.color }}>
                   {c.icon}
@@ -216,11 +237,11 @@ export default function App() {
         <section id="skills" className="section">
           <SectionTitle kicker="SKILLS" title="SKILLS" />
           <div className="skillsGrid">
-            {Object.entries(p.skills || {}).map(([k, list]) => (
+            {Object.entries(p.skills).map(([k, list]) => (
               <div className="skillBlock" key={k}>
                 <div className="skillHead">{k}</div>
                 <ul className="skillList">
-                  {(list || []).map((x) => (
+                  {list.map((x) => (
                     <li key={x}>{x}</li>
                   ))}
                 </ul>
@@ -233,7 +254,7 @@ export default function App() {
         <section id="education" className="section">
           <SectionTitle kicker="EDUCATION" title="EDUCATION" />
           <div className="stack">
-            {(p.education || []).map((e) => (
+            {p.education.map((e) => (
               <div className="rowCard" key={e.school + e.degree}>
                 <div className="rowTop">
                   <div className="rowTitle">
@@ -252,7 +273,7 @@ export default function App() {
         <section id="experience" className="section">
           <SectionTitle kicker="EXPERIENCE" title="WORK EXPERIENCE" />
           <div className="stack">
-            {(p.experience || []).map((x) => (
+            {p.experience.map((x) => (
               <div className="rowCard" key={x.company + x.title}>
                 <div className="rowTop">
                   <div className="rowTitle">
@@ -268,7 +289,7 @@ export default function App() {
                 <div className="rowSub">{x.projectSummary}</div>
 
                 <ul className="bullets">
-                  {(x.bullets || []).map((b) => (
+                  {x.bullets.map((b) => (
                     <li key={b}>{b}</li>
                   ))}
                 </ul>
@@ -277,24 +298,20 @@ export default function App() {
           </div>
         </section>
 
-        {/* PROJECTS */}
+        {/* PROJECTS (show 4 only) */}
         <section id="projects" className="section">
           <SectionTitle kicker="PROJECTS" title="PROJECTS" />
           <div className="projectsGrid">
-            {featuredProjects.map((proj) => (
+            {p.projects.slice(0, 4).map((proj) => (
               <a
                 className="projectCard"
                 key={proj.name}
-                href={proj.links?.github || "#"}
+                href={proj.links.github}
                 target="_blank"
                 rel="noreferrer"
               >
                 <div className="projectImgWrap">
-                  <img
-                    className="projectImg"
-                    src={`/${proj.image}`}
-                    alt={proj.name}
-                  />
+                  <img className="projectImg" src={`/` + proj.image} alt={proj.name} />
                 </div>
                 <div className="projectBody">
                   <div className="projectName">{proj.name}</div>
@@ -317,7 +334,7 @@ export default function App() {
           <SectionTitle kicker="ACHIEVEMENTS" title="ACHIEVEMENTS" />
           <div className="textCard">
             <ul className="bullets" style={{ marginTop: 0 }}>
-              {(p.achievements || []).map((a) => (
+              {p.achievements.map((a) => (
                 <li key={a}>{a}</li>
               ))}
             </ul>

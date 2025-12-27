@@ -408,3 +408,132 @@ img{ max-width: 100%; height: auto; display: block; }
   .projectBody{ padding: 14px; }
   .projectImgWrap{ height: 200px; }
 }
+/* ---------------- MOBILE MENU / DRAWER ---------------- */
+
+.mobileTopbar {
+  display: none;
+}
+
+.drawerOverlay {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  /* show topbar */
+  .mobileTopbar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mobileLeft {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .mobileAvatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .mobileNameWrap { min-width: 0; }
+  .mobileName {
+    font-family: var(--serif);
+    font-size: 14px;
+    color: rgba(255,255,255,0.9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mobileBadge {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    opacity: 0.95;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hamburger {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.9);
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  /* main becomes full width */
+  .main {
+    margin-left: 0;
+    padding: 0 16px;
+  }
+
+  /* sidebar becomes drawer */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 86%;
+    max-width: 320px;
+    transform: translateX(-110%);
+    transition: transform 0.22s ease;
+    z-index: 60;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .drawerOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .drawerOverlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* HERO sizing for mobile */
+  .hero {
+    min-height: 78vh;
+    padding-top: 30px;
+  }
+  .h1 {
+    font-size: 46px;
+  }
+  .heroTyped {
+    font-size: 16px;
+  }
+
+  /* prevent icons crowding */
+  .sideIcons {
+    position: sticky;
+    bottom: 16px;
+    padding-top: 14px;
+    background: transparent;
+  }
+}
