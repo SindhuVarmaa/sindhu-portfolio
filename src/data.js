@@ -89,7 +89,7 @@ export const portfolio = {
     {
       title: "Data Analyst (Academic Research)",
       company: "Binghamton University, SUNY",
-      date: "Aug 2024 - May 2025",
+      date: "Jul 2025 - Present",
       project: "Curriculum Analytics & Benchmarking (Data Science)",
       projectSummary:
         "Benchmarked data science curricula across universities to identify skills coverage gaps and support curriculum updates.",
