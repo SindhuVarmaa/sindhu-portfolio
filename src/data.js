@@ -202,7 +202,7 @@ export const portfolio = {
   achievements: [
     "Received a Merit Scholarship at Binghamton University for academic excellence in the Information Systems program.",
     "Won an IBM Hackathon by building and presenting a real-world solution using data/technology.",
-    "Served as President of Women in Software Engineering at Jawaharlal Nehru College, leading mentoring initiatives and tech participation.",
-    "IEEE Vice President for 3 years during undergrad, organizing workshops and coordinating student-led programs.",
+    "Served as President of Women in Software Engineering at Jawaharlal Nehru Technological University, leading mentoring initiatives and tech participation.",
+    "IEEE Vice President for 3 years during Bachelors, organizing workshops and coordinating student-led programs.",
   ],
 };
